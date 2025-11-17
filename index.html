@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>ROSARY RIDGEBED©® • 7 Gaben Hügelbeet Pyramide</title>
+  <title>ROSARY RIDGEBED • 7 Gaben Hügelbeet Pyramide</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/examples/js/controls/OrbitControls.js"></script>
@@ -66,7 +66,7 @@ const grass = loader.load('https://i.imgur.com/4tZEm8T.jpeg');
 grass.wrapS = grass.wrapT = THREE.RepeatWrapping;
 grass.repeat.set(12,12);
 
-// 7 Schichten Hügelbeet
+// 7 Schichten
 const colors = [0x8b4513,0x8b5a2b,0x228b22,0x654321,0x4b3621,0x5d4037,0x228b22];
 const gaben = ["Furcht des Herrn","Frömmigkeit","Erkenntnis","Stärke","Rat","Verstand","Weisheit"];
 for(let i=0;i<7;i++){
@@ -114,14 +114,14 @@ const starGeo = new THREE.ExtrudeGeometry(starShape,{depth:0.4,bevelEnabled:true
 const starMat = new THREE.MeshPhongMaterial({color:0xffd700,emissive:0xaa8800});
 const star = new THREE.Mesh(starGeo, starMat);
 star.rotation.x = -Math.PI/2;
-star.position.y = 10.6;
+star.position.set(0,10.6,0);
 scene.add(star);
 
 const pyramid = new THREE.Mesh(new THREE.ConeGeometry(1.9,4.2,6), starMat);
 pyramid.position.y = 9.9;
 scene.add(pyramid);
 
-// LICHT – jetzt richtig hell!
+// LICHT – jetzt hell und golden
 scene.add(new THREE.AmbientLight(0xffffff, 4));
 const sun = new THREE.DirectionalLight(0xfff8e1, 10);
 sun.position.set(15,35,15);
