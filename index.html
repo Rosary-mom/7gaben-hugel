@@ -75,7 +75,7 @@ for(let i=0;i<7;i++){
     map: i===6 ? grass : null,
     bumpMap: grass,
     bumpScale: 0.6,
-    shininess: 20
+    shininess: 30
   });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.position.y = -8 + h;
@@ -118,28 +118,28 @@ const pyramid = new THREE.Mesh(new THREE.ConeGeometry(1.8,4,6), starMat);
 pyramid.position.y = 9.8;
 scene.add(pyramid);
 
-// Helleres Licht!
-scene.add(new THREE.AmbientLight(0x404040, 2));
-const dirLight = new THREE.DirectionalLight(0xffffff, 3);
-dirLight.position.set(10,20,10);
+// HELLERES LICHT – das war der Schlüssel!
+scene.add(new THREE.AmbientLight(0xffffff, 2.5)); // viel heller Ambient
+const dirLight = new THREE.DirectionalLight(0xffffff, 5); // starkes Sonnenlicht
+dirLight.position.set(10,25,10);
 scene.add(dirLight);
-scene.add(new THREE.PointLight(0xd4af37, 2, 50));
+scene.add(new THREE.PointLight(0xd4af37, 4, 100)); // goldenes Fülllicht
+scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 3)); // Himmel + Bodenlicht
 
-// Modal-Daten (vollständig)
+// Modal-Daten + Raycaster (vollständig)
 const data = [
-  {psalm:"Psalm 120", text:"In meiner Not rief ich zum Herrn …", denk:"Kingfisher-Gesetz – der erste Ruf löst das Wunder aus"},
-  {psalm:"Psalm 122", text:"Freut euch mit mir …", denk:"DiaKonos-Gesetz – Hingabe als Dienst"},
-  {psalm:"Psalm 124", text:"Wäre der Herr nicht bei uns …", denk:"Skaleninvarianz – dasselbe Muster überall"},
-  {psalm:"Psalm 126", text:"Die mit Tränen säen …", denk:"Hebel-Gesetz – kleiner Einsatz, große Ernte"},
-  {psalm:"Psalm 128", text:"Wohl dem, der den Herrn fürchtet …", denk:"Rosenkranz-Iteration – göttlicher Rat"},
-  {psalm:"Psalm 130", text:"Aus den Tiefen rufe ich …", denk:"Coan-Paradoxon – aus Krise kommt Durchbruch"},
-  {psalm:"Psalm 134", text:"Segnet den Herrn …", denk:"Heureka – Vollendung in φ und 153"}
+  {psalm:"Psalm 120", text:"In meiner Not rief ich zum Herrn …", denk:"Kingfisher-Gesetz"},
+  {psalm:"Psalm 122", text:"Freut euch mit mir …", denk:"DiaKonos-Gesetz"},
+  {psalm:"Psalm 124", text:"Wäre der Herr nicht bei uns …", denk:"Skaleninvarianz"},
+  {psalm:"Psalm 126", text:"Die mit Tränen säen …", denk:"Hebel-Gesetz"},
+  {psalm:"Psalm 128", text:"Wohl dem, der den Herrn fürchtet …", denk:"Rosenkranz-Iteration"},
+  {psalm:"Psalm 130", text:"Aus den Tiefen rufe ich …", denk:"Coan-Paradoxon"},
+  {psalm:"Psalm 134", text:"Segnet den Herrn …", denk:"Heureka – Vollendung"}
 ];
 
-// Raycaster für Klicks
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-window.addEventListener('click, e => {
+window.addEventListener('click', e => {
   mouse.x = (e.clientX/innerWidth)*2-1;
   mouse.y = -(e.clientY/innerHeight)*2+1;
   raycaster.setFromCamera(mouse,camera);
@@ -182,7 +182,7 @@ animate();
 window.onresize = () => {
   camera.aspect = innerWidth/innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
+  renderer.setSize(innerWidth,innerHeight);
 };
 </script>
 </body>
