@@ -2,13 +2,13 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>ROSARY RIDGEBED • 7 Gaben Hügelbeet Pyramide</title>
+<title>ROSARY RIDGEBED©® • 7 Gaben Hügelbeet Pyramide</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/examples/js/exporters/STLExporter.js"></script>
 <style>
-  body{margin:0;overflow:hidden;background:#0a1a2f;color:#fff;font-family:Arial}
+  body{margin:0;overflow:hidden;background:#001133;color:#fff;font-family:Arial}
   #info,#controls{position:absolute;padding:20px;border-radius:12px;backdrop-filter:blur(12px);border:1px solid rgba(212,175,55,0.5);background:rgba(0,0,0,0.7);z-index:10}
   #info{top:10px;left:10px;max-width:420px}
   #controls{bottom:20px;left:20px}
@@ -22,7 +22,7 @@
 <div id="canvas-container"></div>
 
 <div id="info">
-  <h1 style="margin:0;color:#d4af37;text-shadow:0 0 10px gold">7 Gaben des Hl. Geistes – Goldener Weg</h1>
+  <h1 style="margin:0;color:#d4af37;text-shadow:0 0 15px gold">7 Gaben des Hl. Geistes – Goldener Weg</h1>
   <button onclick="toggleView()">Laien ↔ Forscher Modus</button>
   <div id="laien"><p style="line-height:1.6"><b>Eselsbrücke:</b> Der Hügel wächst wie eine Schnecke 🐌 – jede Windung größer (Fibonacci). Jede Schicht ist eine Gabe – von der Demut unten bis zur Weisheit oben.</p></div>
   <div id="forscher" style="display:none"><p style="line-height:1.6"><b>Rosenkranz-Approximation n=17 → 153</b><br>h ≈ Σ binom(17,k) (1/φ)^k · h^(k)(Q)<br>Skaleninvarianz: S(r) = k · r^φ</p></div>
@@ -45,7 +45,7 @@
 
 <script>
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0a1a2f);
+scene.background = new THREE.Color(0x001133); // sanftes Nachtblau
 const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
 camera.position.set(10,10,15);
 const renderer = new THREE.WebGLRenderer({antialias:true});
@@ -74,8 +74,8 @@ for(let i=0;i<7;i++){
     color: colors[i],
     map: i===6 ? grass : null,
     bumpMap: grass,
-    bumpScale: 0.6,
-    shininess: 30
+    bumpScale: 0.7,
+    shininess: 40
   });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.position.y = -8 + h;
@@ -93,40 +93,40 @@ for(let i=0;i<1400;i++){
   if(i%100===0) y += 0.9;
 }
 const curve = new THREE.CatmullRomCurve3(points);
-const tubeGeo = new THREE.TubeGeometry(curve,1400,0.22,16,false);
-const tubeMat = new THREE.MeshPhongMaterial({color:0xd4af37,emissive:0x885500,shininess:100});
+const tubeGeo = new THREE.TubeGeometry(curve,1400,0.25,16,false);
+const tubeMat = new THREE.MeshPhongMaterial({color:0xffd700,emissive:0xaa8800,shininess:150});
 const spiral = new THREE.Mesh(tubeGeo, tubeMat);
 scene.add(spiral);
 
 // Salomonisches Siegel + Pyramide oben
 const starShape = new THREE.Shape();
-const outer = 1.4, inner = 0.7;
+const outer = 1.5, inner = 0.75;
 for(let i=0;i<12;i++){
   const a = i/6*Math.PI;
   const r = i%2===0 ? outer : inner;
   i===0 ? starShape.moveTo(r*Math.sin(a),r*Math.cos(a)) : starShape.lineTo(r*Math.sin(a),r*Math.cos(a));
 }
 starShape.closePath();
-const starGeo = new THREE.ExtrudeGeometry(starShape,{depth:0.3,bevelEnabled:true});
-const starMat = new THREE.MeshPhongMaterial({color:0xd4af37,emissive:0x885500});
+const starGeo = new THREE.ExtrudeGeometry(starShape,{depth:0.4,bevelEnabled:true});
+const starMat = new THREE.MeshPhongMaterial({color:0xffd700,emissive:0xaa8800});
 const star = new THREE.Mesh(starGeo, starMat);
 star.rotation.x = -Math.PI/2;
-star.position.y = 10.5;
+star.position.y = 10.6;
 scene.add(star);
 
-const pyramid = new THREE.Mesh(new THREE.ConeGeometry(1.8,4,6), starMat);
-pyramid.position.y = 9.8;
+const pyramid = new THREE.Mesh(new THREE.ConeGeometry(1.9,4.2,6), starMat);
+pyramid.position.y = 9.9;
 scene.add(pyramid);
 
-// HELLERES LICHT – das war der Schlüssel!
-scene.add(new THREE.AmbientLight(0xffffff, 2.5)); // viel heller Ambient
-const dirLight = new THREE.DirectionalLight(0xffffff, 5); // starkes Sonnenlicht
-dirLight.position.set(10,25,10);
-scene.add(dirLight);
-scene.add(new THREE.PointLight(0xd4af37, 4, 100)); // goldenes Fülllicht
-scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 3)); // Himmel + Bodenlicht
+// SEHR HELLERES LICHT – jetzt strahlt alles!
+scene.add(new THREE.AmbientLight(0xffffff, 3.5)); // sehr helles Umgebungslicht
+const sunLight = new THREE.DirectionalLight(0xfff8e1, 8); // warmes Sonnenlicht
+sunLight.position.set(15,30,15);
+scene.add(sunLight);
+scene.add(new THREE.PointLight(0xffd700, 6, 100)); // intensives goldenes Licht von oben
+scene.add(new THREE.HemisphereLight(0x87ceeb, 0x228b22, 4)); // Himmel hellblau, Boden grün – wie bei Sonnenaufgang
 
-// Modal-Daten + Raycaster (vollständig)
+// Modal-Daten + Raycaster
 const data = [
   {psalm:"Psalm 120", text:"In meiner Not rief ich zum Herrn …", denk:"Kingfisher-Gesetz"},
   {psalm:"Psalm 122", text:"Freut euch mit mir …", denk:"DiaKonos-Gesetz"},
