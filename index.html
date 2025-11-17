@@ -83,7 +83,7 @@ for(let i=0;i<7;i++){
   terraces.push(mesh);
 }
 
-// Goldene Spirale (Chartres-ähnlich)
+// Goldene Spirale
 const points = [];
 let radius = 0.3, angle = 0, y = -8;
 for(let i=0;i<1400;i++){
@@ -98,7 +98,7 @@ const tubeMat = new THREE.MeshPhongMaterial({color:0xd4af37,emissive:0x885500,sh
 const spiral = new THREE.Mesh(tubeGeo, tubeMat);
 scene.add(spiral);
 
-// Salomonisches Siegel + Pyramide oben (wie vorher)
+// Salomonisches Siegel + Pyramide oben
 const starShape = new THREE.Shape();
 const outer = 1.4, inner = 0.7;
 for(let i=0;i<12;i++){
@@ -118,20 +118,58 @@ const pyramid = new THREE.Mesh(new THREE.ConeGeometry(1.8,4,6), starMat);
 pyramid.position.y = 9.8;
 scene.add(pyramid);
 
-// Licht (jetzt heller!)
-scene.add(new THREE.AmbientLight(0x404040, 1.5));
-const dirLight = new THREE.DirectionalLight(0xffffff, 2);
+// Helleres Licht!
+scene.add(new THREE.AmbientLight(0x404040, 2));
+const dirLight = new THREE.DirectionalLight(0xffffff, 3);
 dirLight.position.set(10,20,10);
 scene.add(dirLight);
-scene.add(new THREE.PointLight(0xd4af37, 1, 50));
+scene.add(new THREE.PointLight(0xd4af37, 2, 50));
 
-// Modal-Daten + Raycaster (wie vorher)
+// Modal-Daten (vollständig)
+const data = [
+  {psalm:"Psalm 120", text:"In meiner Not rief ich zum Herrn …", denk:"Kingfisher-Gesetz – der erste Ruf löst das Wunder aus"},
+  {psalm:"Psalm 122", text:"Freut euch mit mir …", denk:"DiaKonos-Gesetz – Hingabe als Dienst"},
+  {psalm:"Psalm 124", text:"Wäre der Herr nicht bei uns …", denk:"Skaleninvarianz – dasselbe Muster überall"},
+  {psalm:"Psalm 126", text:"Die mit Tränen säen …", denk:"Hebel-Gesetz – kleiner Einsatz, große Ernte"},
+  {psalm:"Psalm 128", text:"Wohl dem, der den Herrn fürchtet …", denk:"Rosenkranz-Iteration – göttlicher Rat"},
+  {psalm:"Psalm 130", text:"Aus den Tiefen rufe ich …", denk:"Coan-Paradoxon – aus Krise kommt Durchbruch"},
+  {psalm:"Psalm 134", text:"Segnet den Herrn …", denk:"Heureka – Vollendung in φ und 153"}
+];
 
-const data = [ /* deine 7 Einträge */ ];
+// Raycaster für Klicks
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+window.addEventListener('click, e => {
+  mouse.x = (e.clientX/innerWidth)*2-1;
+  mouse.y = -(e.clientY/innerHeight)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+  const hits = raycaster.intersectObjects(terraces);
+  if(hits.length){
+    const i = terraces.indexOf(hits[0].object);
+    document.getElementById('modal-title').textContent = gaben[i];
+    document.getElementById('modal-psalm').textContent = data[i].psalm + ": " + data[i].text;
+    document.getElementById('modal-denk').textContent = "Denkgesetz: " + data[i].denk;
+    document.getElementById('modal').style.display = 'flex';
+  }
+});
 
-// ... (Raycaster und Modal-Funktion wie in meiner letzten Nachricht)
+// STL Export
+function exportSTL(){
+  const exporter = new THREE.STLExporter();
+  const stl = exporter.parse(scene);
+  const blob = new Blob([stl],{type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'rosary_ridgebed.stl';
+  a.click();
+}
 
-// STL Export + toggleView + animate + resize (wie vorher)
+function toggleView(){
+  const l = document.getElementById('laien');
+  const f = document.getElementById('forscher');
+  l.style.display = l.style.display==='none' ? 'block' : 'none';
+  f.style.display = f.style.display==='none' ? 'block' : 'none';
+}
 
 function animate(){
   requestAnimationFrame(animate);
@@ -140,6 +178,12 @@ function animate(){
   renderer.render(scene,camera);
 }
 animate();
+
+window.onresize = () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+};
 </script>
 </body>
 </html>
