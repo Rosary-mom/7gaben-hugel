@@ -25,7 +25,7 @@
   <h1 style="margin:0;color:#d4af37;text-shadow:0 0 10px gold">7 Gaben des Hl. Geistes – Goldener Weg</h1>
   <button onclick="toggleView()">Laien ↔ Forscher Modus</button>
   <div id="laien"><p style="line-height:1.6"><b>Eselsbrücke:</b> Der Hügel wächst wie eine Schnecke 🐌 – jede Windung größer (Fibonacci). Jede Schicht ist eine Gabe – von der Demut unten bis zur Weisheit oben.</p></div>
-  <div id="forscher" style="display:none"><p style="line-height:1.6"><b>Rosenkranz-Approximation n=17 → 153</b><br>h ≈ Σ binom(17,k) (1/φ)^k · h^(k)(Q)<br>Skaleninvarianz: S(r) = k · r^φ<br>φ ≈ 1.618 (Goldener Schnitt)</p></div>
+  <div id="forscher" style="display:none"><p style="line-height:1.6"><b>Rosenkranz-Approximation n=17 → 153</b><br>h ≈ Σ binom(17,k) (1/φ)^k · h^(k)(Q)<br>Skaleninvarianz: S(r) = k · r^φ<br>φ ≈ 1.618</p></div>
 </div>
 
 <div id="controls">
@@ -38,8 +38,8 @@
   <div id="modal-content" onclick="event.stopPropagation()">
     <span class="close">×</span>
     <h2 id="modal-title" style="color:#d4af37"></h2>
-    <p id="modal-psalm" style="font-size:1.1em"></p>
-    <p id="modal-denk" style="color:#d4af37;font-style:italic"></p>
+    <p id="modal-psalm"></p>
+    <p id="modal-denk" style="color:#d4af37;font-style:italic;"></p>
   </div>
 </div>
 
@@ -59,11 +59,11 @@ const terraces = [];
 
 // Gras-Textur
 const loader = new THREE.TextureLoader();
-const grass = loader.load('https://i.imgur.com/4tZEm8T.jpeg', () => renderer.render(scene, camera));
+const grass = loader.load('https://i.imgur.com/4tZEm8T.jpeg');
 grass.wrapS = grass.wrapT = THREE.RepeatWrapping;
 grass.repeat.set(12,12);
 
-// 7 Hügelbeet-Schichten (Hügelkultur-Aufbau)
+// 7 Hügelbeet-Schichten
 const colors = [0x8b4513,0x8b5a2b,0x228b22,0x654321,0x4b3621,0x5d4037,0x228b22];
 const gaben = ["Furcht des Herrn","Frömmigkeit","Erkenntnis","Stärke","Rat","Verstand","Weisheit"];
 for(let i=0;i<7;i++){
@@ -83,7 +83,7 @@ for(let i=0;i<7;i++){
   terraces.push(mesh);
 }
 
-// Goldene φ-Spirale (Labyrinth-Weg)
+// Goldene Spirale
 const points = [];
 let radius = 0.3, angle = 0, y = -8;
 for(let i=0;i<1400;i++){
@@ -124,15 +124,15 @@ const dirLight = new THREE.DirectionalLight(0xffffff,1.2);
 dirLight.position.set(10,15,10);
 scene.add(dirLight);
 
-// Modal-Daten (Psalmen + Denkgesetze)
+// Modal-Daten
 const data = [
-  {psalm:"Psalm 120", text:"In meiner Not rief ich zum Herrn …", denk:"Kingfisher-Gesetz – der erste Ruf löst das Wunder aus"},
-  {psalm:"Psalm 122", text:"Freut euch mit mir … ins Haus des Herrn", denk:"DiaKonos-Gesetz – Hingabe als Dienst"},
-  {psalm:"Psalm 124", text:"Wäre der Herr nicht bei uns …", denk:"Skaleninvarianz – dasselbe Muster überall"},
-  {psalm:"Psalm 126", text:"Die mit Tränen säen …", denk:"Hebel-Gesetz – kleiner Einsatz, große Ernte"},
-  {psalm:"Psalm 128", text:"Wohl dem, der den Herrn fürchtet …", denk:"Rosenkranz-Iteration – göttlicher Rat"},
-  {psalm:"Psalm 130", text:"Aus den Tiefen rufe ich …", denk:"Coan-Paradoxon – aus Krise kommt Durchbruch"},
-  {psalm:"Psalm 134", text:"Segnet den Herrn, alle Knechte …", denk:"Heureka – Vollendung in φ und 153"}
+  {psalm:"Psalm 120", text:"In meiner Not rief ich zum Herrn …", denk:"Kingfisher-Gesetz"},
+  {psalm:"Psalm 122", text:"Freut euch mit mir …", denk:"DiaKonos-Gesetz"},
+  {psalm:"Psalm 124", text:"Wäre der Herr nicht bei uns …", denk:"Skaleninvarianz"},
+  {psalm:"Psalm 126", text:"Die mit Tränen säen …", denk:"Hebel-Gesetz"},
+  {psalm:"Psalm 128", text:"Wohl dem, der den Herrn fürchtet …", denk:"Rosenkranz-Iteration"},
+  {psalm:"Psalm 130", text:"Aus den Tiefen rufe ich …", denk:"Coan-Paradoxon"},
+  {psalm:"Psalm 134", text:"Segnet den Herrn …", denk:"Heureka – Vollendung"}
 ];
 
 // Raycaster
@@ -159,13 +159,15 @@ function exportSTL(){
   const blob = new Blob([stl],{type:'text/plain'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'rosary_ridgebed_pyramide.stl';
+  a.download = 'rosary_ridgebed.stl';
   a.click();
 }
 
 function toggleView(){
-  document.getElementById('laien').style.display = document.getElementById('laien').style.display==='none' ? 'block' : 'none';
-  document.getElementById('forscher').style.display = document.getElementById('forscher').style.display==='none' ? 'block' : 'none';
+  const l = document.getElementById('laien');
+  const f = document.getElementById('forscher');
+  l.style.display = l.style.display==='none' ? 'block' : 'none';
+  f.style.display = f.style.display==='none' ? 'block' : 'none';
 }
 
 function animate(){
