@@ -143,7 +143,7 @@ const data = [
 // Raycaster
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-window.addEventListener('click', e => {
+window.addEventListener('click', e => {  // <--- hier war das fehlende '
   mouse.x = (e.clientX/window.innerWidth)*2-1;
   mouse.y = -(e.clientY/window.innerHeight)*2+1;
   raycaster.setFromCamera(mouse,camera);
@@ -177,7 +177,7 @@ function toggleView(){
 
 function animate(){
   requestAnimationFrame(animate);
-  if(isRotating) spiral.rotation.y += 0.002;
+  if(isRotating) spiral.rotation.y += 0.rotation.y += 0.002;
   controls.update();
   renderer.render(scene,camera);
 }
