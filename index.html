@@ -70,7 +70,7 @@ loader.load('https://i.imgur.com/4tZEm8T.jpeg', texture => {
   renderer.render(scene, camera);
 });
 
-// 7 Schichten
+// 7 Schichten Hügelbeet
 const colors = [0x8b4513,0x8b5a2b,0x228b22,0x654321,0x4b3621,0x5d4037,0x228b22];
 const gaben = ["Furcht des Herrn","Frömmigkeit","Erkenntnis","Stärke","Rat","Verstand","Weisheit"];
 for(let i=0;i<7;i++){
@@ -90,14 +90,14 @@ for(let i=0;i<7;i++){
   terraces.push(mesh);
 }
 
-// Goldene Spirale
+// Goldene Spirale – jetzt ohne doppeltes +=
 const points = [];
 let radius = 0.3, angle = 0, y = -8;
 for(let i=0;i<1400;i++){
   points.push(new THREE.Vector3(radius*Math.cos(angle), y, radius*Math.sin(angle)));
   angle += 0.13;
   radius += 0.009;
-  if(i%100===0) y +=  += 0.9;
+  if(i%100===0) y += 0.9; // <-- hier war der Fehler!
 }
 const curve = new THREE.CatmullRomCurve3(points);
 const tubeGeo = new THREE.TubeGeometry(curve,1400,0.25,16,false);
@@ -108,7 +108,7 @@ scene.add(spiral);
 // Salomonisches Siegel + Pyramide oben
 const starShape = new THREE.Shape();
 const outer = 1.5, inner = 0.75;
-for(let i=0;i<12;i++){
+for(let i=0;i<12;i++){ // 12 für richtigen Stern
   const a = i/6*Math.PI;
   const r = i%2===0 ? outer : inner;
   i===0 ? starShape.moveTo(r*Math.sin(a),r*Math.cos(a)) : starShape.lineTo(r*Math.sin(a),r*Math.cos(a));
@@ -125,7 +125,7 @@ const pyramid = new THREE.Mesh(new THREE.ConeGeometry(1.9,4.2,6), starMat);
 pyramid.position.y = 9.9;
 scene.add(pyramid);
 
-// LICHT – hell und golden
+// Helles Licht
 scene.add(new THREE.AmbientLight(0xffffff, 4));
 const sun = new THREE.DirectionalLight(0xfff8e1, 10);
 sun.position.set(15,35,15);
@@ -144,7 +144,7 @@ const data = [
   {psalm:"Psalm 134", text:"Segnet den Herrn …", denk:"Heureka – Vollendung"}
 ];
 
-// Raycaster – jetzt mit korrektem '
+// Raycaster – korrekt
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 window.addEventListener('click', e => {
