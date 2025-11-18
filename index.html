@@ -2,268 +2,207 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>ROSARY RIDGEBED©®™ • High-End Simulation</title>
+  <title>ROSARY RIDGEBED • 7 Gaben Hügelbeet Pyramide</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/examples/js/exporters/STLExporter.js"></script>
-  
   <style>
-    body { margin: 0; overflow: hidden; background: radial-gradient(circle at center, #0b1a33 0%, #000000 100%); color: #fff; font-family: sans-serif; }
-    
-    #ui-container {
-      position: absolute; top: 20px; left: 20px; z-index: 10;
-      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
-      padding: 20px; border-radius: 15px; border-left: 4px solid #d4af37;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 350px;
-    }
-    
-    h1 { margin: 0 0 10px 0; color: #d4af37; font-size: 1.4rem; letter-spacing: 1px; text-transform: uppercase; }
-    p { font-size: 0.9rem; color: #ccc; line-height: 1.5; }
-    
-    button {
-      background: linear-gradient(135deg, #d4af37 0%, #aa8800 100%);
-      border: none; padding: 10px 20px; color: #000; font-weight: bold;
-      border-radius: 25px; cursor: pointer; margin-top: 10px; width: 100%;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    button:hover { transform: scale(1.02); box-shadow: 0 0 15px #d4af37; color: #fff; }
-
-    /* Modal Styles */
-    #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 20; justify-content: center; align-items: center; }
-    #modal-box { background: #111; border: 2px solid #d4af37; padding: 40px; max-width: 500px; text-align: center; border-radius: 10px; position: relative; }
-    .close-btn { position: absolute; top: 10px; right: 20px; font-size: 30px; color: #d4af37; cursor: pointer; }
+    body { margin: 0; overflow: hidden; background: #001133; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; }
+    #info, #controls { position: absolute; padding: 20px; border-radius: 12px; backdrop-filter: blur(12px); border: 1px solid rgba(212, 175, 55, 0.5); background: rgba(0, 0, 0, 0.7); z-index: 10; box-shadow: 0 8px 32px 0 rgba(0, 0 0 / 0.37); }
+    #info { top: 10px; left: 10px; max-width: 420px; }
+    #controls { bottom: 20px; left: 20px; }
+    button { padding: 10px 20px; margin: 5px; background: linear-gradient(45deg, #d4af37, #ffd700); border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #000; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); }
+    button:hover { transform: scale(1.05); background: linear-gradient(45deg, #ffd700, #fff); }
+    #modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+    #modal-content { background: #1a1a1a; padding: 40px; border-radius: 15px; border: 2px solid #d4af37; max-width: 600px; text-align: center; position: relative; box-shadow: 0 0 50px rgba(212, 175, 55, 0.2); }
+    .close { position: absolute; top: 10px; right: 20px; font-size: 40px; cursor: pointer; color: #d4af37; }
+    h1 { margin: 0 0 10px 0; color: #d4af37; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); font-size: 1.5rem; }
+    p { line-height: 1.5; }
   </style>
 </head>
 <body>
+<div id="canvas-container"></div>
 
-<div id="ui-container">
-  <h1>7 Gaben Pyramide</h1>
-  <p>Eine interaktive Visualisierung der Rosary Ridgebed Struktur.</p>
-  <p style="font-size: 0.8rem; color: #d4af37;">✨ Tippe auf die Ebenen für Psalmen</p>
-  <button onclick="exportSTL()">💾 Modell downloaden (STL)</button>
-  <button onclick="toggleRotation()">🔄 Rotation an/aus</button>
+<div id="info">
+  <h1>7 Gaben des Hl. Geistes – Goldener Weg</h1>
+  <button onclick="toggleView()">Laien ↔ Forscher Modus</button>
+  <div id="laien">
+    <p><b>Das Prinzip:</b> Der Hügel wächst spiralförmig wie ein Schneckenhaus 🐌 (Fibonacci).<br>Jede Ebene steht für eine der 7 Gaben – beginnend bei der Demut (Furcht des Herrn) bis zur Weisheit an der Spitze.</p>
+    <p style="font-size:0.9em; color:#aaa;"><i>Klicken Sie auf die Ebenen für Details.</i></p>
+  </div>
+  <div id="forscher" style="display:none">
+    <p><b>Rosenkranz-Approximation n=17 → 153</b></p>
+    <p style="font-family: monospace; background:rgba(0,0,0,0.5); padding:5px; border-radius:4px;">h ≈ Σ binom(17,k) (1/φ)^k · h^(k)(Q)</p>
+    <p>Skaleninvarianz: S(r) = k · r^φ<br>Hydrodynamische Optimierung durch Permakultur-Design.</p>
+  </div>
+</div>
+
+<div id="controls">
+  <button onclick="resetCamera()">Ansicht zurücksetzen</button>
+  <button onclick="toggleRotation()">Rotation an/aus</button>
+  <button onclick="exportSTL()">3D-Druck (STL)</button>
 </div>
 
 <div id="modal" onclick="closeModal()">
-  <div id="modal-box" onclick="event.stopPropagation()">
-    <span class="close-btn" onclick="closeModal()">×</span>
-    <h2 id="m-title" style="color: #d4af37; margin-top:0;"></h2>
-    <hr style="border-color: #333; margin: 15px 0;">
-    <p id="m-text" style="font-size: 1.1em; font-style: italic;"></p>
-    <p id="m-law" style="color: #888; font-size: 0.9em; margin-top: 20px;"></p>
+  <div id="modal-content" onclick="event.stopPropagation()">
+    <span class="close" onclick="closeModal()">×</span>
+    <h2 id="modal-title" style="color:#d4af37; margin-top:0;"></h2>
+    <hr style="border-color:#333; margin: 15px 0;">
+    <p id="modal-psalm" style="font-size: 1.1em;"></p>
+    <p id="modal-denk" style="color:#d4af37; font-style:italic; margin-top:20px;"></p>
   </div>
 </div>
 
 <script>
-// --- SZENE SETUP ---
+// --- SETUP ---
 const scene = new THREE.Scene();
-// Kein statischer Hintergrund mehr, damit der CSS Gradient wirkt:
-scene.background = null; 
+scene.background = new THREE.Color(0x001133);
+scene.fog = new THREE.FogExp2(0x001133, 0.015);
 
-const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.set(15, 12, 20);
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.set(10,15,20);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
-// WICHTIG: Schatten aktivieren
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-// WICHTIG: Farben korrigieren für realistischeren Look
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-document.body.appendChild(renderer.domElement);
+document.getElementById('canvas-container').appendChild(renderer.domElement);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls);
 controls.enableDamping = true;
-controls.dampingFactor = 0.05;
-controls.autoRotate = true;
-controls.autoRotateSpeed = 1.0;
 
-// --- GENERATOR FÜR GRAS-TEXTUR (Keine externen Bilder!) ---
-function createGrassTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 512; canvas.height = 512;
-  const ctx = canvas.getContext('2d');
-  // Grundfarbe
-  ctx.fillStyle = '#2a5a1b';
-  ctx.fillRect(0,0,512,512);
-  // Rauschen/Gras-Struktur zeichnen
-  for(let i=0; i<10000; i++) {
-    ctx.fillStyle = Math.random() > 0.5 ? '#3a7a2b' : '#1a3a0b';
-    const x = Math.random() * 512;
-    const y = Math.random() * 512;
-    const w = Math.random() * 4 + 1;
-    const h = Math.random() * 10 + 2;
-    ctx.fillRect(x,y,w,h);
-  }
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(4, 1);
-  return texture;
-}
-const grassTexture = createGrassTexture();
-
-// --- BELEUCHTUNG (Cinematic) ---
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-scene.add(ambientLight);
-
-const sunLight = new THREE.DirectionalLight(0xfffaed, 2.5);
-sunLight.position.set(20, 50, 20);
-sunLight.castShadow = true;
-sunLight.shadow.mapSize.width = 2048;
-sunLight.shadow.mapSize.height = 2048;
-scene.add(sunLight);
-
-// Goldenes Licht von unten für Dramatik
-const spotLight = new THREE.SpotLight(0xd4af37, 10);
-spotLight.position.set(0, -10, 0);
-spotLight.angle = Math.PI / 4;
-scene.add(spotLight);
-
-// --- GEOMETRIE ---
+let isRotating = true;
 const terraces = [];
-const colors = [0x5c4033, 0x70503c, 0x2e8b57, 0x4a3728, 0x3e2b1f, 0x2b1e16, 0xffffff]; // Letzte Farbe ignoriert da Textur
-const gaben = ["Furcht des Herrn", "Frömmigkeit", "Erkenntnis", "Stärke", "Rat", "Verstand", "Weisheit (Spitze)"];
 
-for(let i=0; i<7; i++) {
-  const bottomR = 9 - i * 1.2;
-  const topR = 9 - (i + 1) * 1.2;
-  const height = 1.5;
-  
-  const geometry = new THREE.CylinderGeometry(topR, bottomR, height, 64);
-  
-  let material;
-  
-  // Oberste Schicht bekommt Gras-Textur
-  if (i === 6) {
-     material = new THREE.MeshStandardMaterial({ 
-       map: grassTexture,
-       bumpMap: grassTexture,
-       bumpScale: 0.5,
-       color: 0xffffff,
-       roughness: 0.8
-     });
-  } else {
-     // Andere Schichten: Erd-Look (StandardMaterial reagiert auf Licht)
-     material = new THREE.MeshStandardMaterial({ 
-       color: colors[i], 
-       roughness: 0.9, // Matt wie Erde
-       metalness: 0.1
-     });
-  }
+// Gras-Textur
+const loader = new THREE.TextureLoader();
+let grass;
+loader.load('https://i.imgur.com/4tZEm8T.jpeg', texture => {
+  grass = texture;
+  grass.wrapS = grass.wrapT = THREE.RepeatWrapping;
+  grass.repeat.set(12,12);
+  renderer.render(scene, camera);
+});
 
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.y = -4 + (i * height);
-  mesh.castShadow = true; // Wirft Schatten
-  mesh.receiveShadow = true; // Empfängt Schatten
-  mesh.userData = { id: i };
-  
+// 7 Schichten
+const colors = [0x8b4513,0x8b5a2b,0x228b22,0x654321,0x4b3621,0x5d4037,0x228b22];
+const gaben = ["Furcht des Herrn","Frömmigkeit","Erkenntnis","Stärke","Rat","Verstand","Weisheit"];
+for(let i=0;i<7;i++){
+  const h = (i+1)/8*16;
+  const r = 9*(1-i/8);
+  const geo = new THREE.CylinderGeometry(r, r+1.2, 2.5, 64,1,true);
+  const mat = new THREE.MeshPhongMaterial({
+    color: colors[i],
+    map: i===6 && grass ? grass : null,
+    bumpMap: grass || null,
+    bumpScale: 0.7,
+    shininess: 40
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.y = -8 + h;
   scene.add(mesh);
   terraces.push(mesh);
 }
 
-// --- GOLDENE SPIRALE (Leuchtend) ---
-const points = [];
-let r = 0.1, ang = 0, yPos = -4;
-for(let i=0; i<1000; i++) {
-  points.push(new THREE.Vector3(r * Math.cos(ang), yPos, r * Math.sin(ang)));
-  ang += 0.15;
-  r += 0.008;
-  yPos += 0.015;
-}
-const tubeGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 300, 0.1, 8, false);
-const tubeMat = new THREE.MeshStandardMaterial({ 
-  color: 0xffd700, 
-  emissive: 0xffaa00, // Selbstleuchtend
-  emissiveIntensity: 0.5,
-  metalness: 1, 
-  roughness: 0.2 
-});
-const spiral = new THREE.Mesh(tubeGeo, tubeMat);
-spiral.castShadow = true;
+// Goldene Spirale – wachsende Version
+const spiralPoints = [];
+const spiralGeo = new THREE.BufferGeometry();
+const maxPoints = 2000;
+const positions = new Float32Array(maxPoints * 3);
+spiralGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+const spiralMat = new THREE.MeshPhongMaterial({color:0xffd700,emissive:0xaa8800,shininess:150});
+const spiral = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(spiralPoints), 64, 0.25, 16, false), spiralMat);
 scene.add(spiral);
 
-// --- SPITZE (Reflektierendes Gold) ---
-const topGeo = new THREE.OctahedronGeometry(1.5, 0);
-const goldMat = new THREE.MeshPhysicalMaterial({
-  color: 0xffd700,
-  metalness: 1.0,
-  roughness: 0.0, // Spiegelglatt
-  clearcoat: 1.0,
-  clearcoatRoughness: 0.1
-});
-const star = new THREE.Mesh(topGeo, goldMat);
-star.position.set(0, 7.5, 0);
-star.castShadow = true;
+// Salomonisches Siegel + Pyramide
+const starShape = new THREE.Shape();
+const outer = 1.5, inner = 0.75;
+for(let i=0;i<12;i++){
+  const a = i/6*Math.PI;
+  const r = i%2===0 ? outer : inner;
+  i===0 ? starShape.moveTo(r*Math.sin(a),r*Math.cos(a)) : starShape.lineTo(r*Math.sin(a),r*Math.cos(a));
+}
+starShape.closePath();
+const starGeo = new THREE.ExtrudeGeometry(starShape,{depth:0.4,bevelEnabled:true});
+const starMat = new THREE.MeshPhongMaterial({color:0xffd700,emissive:0xaa8800});
+const star = new THREE.Mesh(starGeo, starMat);
+star.rotation.x = -Math.PI / 2;
+star.position.y = 10.6;
 scene.add(star);
 
-// --- LOGIK ---
-const dataText = [
-  {t:"Demut ist das Fundament.", l:"Gesetz: Das Fundament trägt alles."},
-  {t:"Frömmigkeit verbindet uns.", l:"Gesetz: Verbindung schafft Stärke."},
-  {t:"Erkenntnis öffnet die Augen.", l:"Gesetz: Sehen heißt Verstehen."},
-  {t:"Stärke gibt uns Halt.", l:"Gesetz: Widerstand formt Charakter."},
-  {t:"Rat weist den Weg.", l:"Gesetz: Orientierung spart Energie."},
-  {t:"Verstand durchdringt alles.", l:"Gesetz: Tiefe vor Breite."},
-  {t:"Weisheit vollendet das Werk.", l:"Gesetz: Das Ende krönt den Anfang."}
+const pyramid = new THREE.Mesh(new THREE.ConeGeometry(1.9,4.2,6), starMat);
+pyramid.position.y = 9.9;
+scene.add(pyramid);
+
+// LICHT
+scene.add(new THREE.AmbientLight(0xffffff, 5));
+const sun = new THREE.DirectionalLight(0xfff8e1, 12);
+sun.position.set(15,40,15);
+scene.add(sun);
+const pointLight = new THREE.PointLight(0xffd700, 10, 100);
+scene.add(pointLight);
+scene.add(new THREE.HemisphereLight(0x87ceeb, 0x228b22, 6));
+
+// Modal-Daten
+const data = [
+  {psalm:"Psalm 120", text:"In meiner Not rief ich zum Herrn …", denk:"Kingfisher-Gesetz"},
+  {psalm:"Psalm 122", text:"Freut euch mit mir …", denk:"DiaKonos-Gesetz"},
+  {psalm:"Psalm 124", text:"Wäre der Herr nicht bei uns …", denk:"Skaleninvarianz"},
+  {psalm:"Psalm 126", text:"Die mit Tränen säen …", denk:"Hebel-Gesetz"},
+  {psalm:"Psalm 128", text:"Wohl dem, der den Herrn fürchtet …", denk:"Rosenkranz-Iteration"},
+  {psalm:"Psalm 130", text:"Aus den Tiefen rufe ich …", denk:"Coan-Paradoxon"},
+  {psalm:"Psalm 134", text:"Segnet den Herrn …", denk:"Heureka – Vollendung"}
 ];
 
+// Raycaster
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-
-window.addEventListener('pointerdown', (event) => {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(terraces);
-  
-  if(intersects.length > 0) {
-    const id = intersects[0].object.userData.id;
-    document.getElementById('m-title').innerText = (id+1) + ". " + gaben[id];
-    document.getElementById('m-text').innerText = dataText[id].t;
-    document.getElementById('m-law').innerText = dataText[id].l;
+window.addEventListener('click', e => {
+  mouse.x = (e.clientX/window.innerWidth)*2-1;
+  mouse.y = -(e.clientY/window.innerHeight)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+  const hits = raycaster.intersectObjects(terraces);
+  if(hits.length){
+    const i = terraces.indexOf(hits[0].object);
+    document.getElementById('modal-title').textContent = gaben[i];
+    document.getElementById('modal-psalm').textContent = data[i].psalm + ": " + data[i].text;
+    document.getElementById('modal-denk').textContent = "Denkgesetz: " + data[i].denk;
     document.getElementById('modal').style.display = 'flex';
-    controls.autoRotate = false;
   }
 });
 
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
-  controls.autoRotate = true;
-}
-
-function toggleRotation() {
-  controls.autoRotate = !controls.autoRotate;
-}
-
-function exportSTL() {
+// Export + toggle + animate
+function exportSTL(){
   const exporter = new THREE.STLExporter();
-  const str = exporter.parse(scene);
-  const blob = new Blob([str], {type: 'text/plain'});
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'Rosary_Pyramid.stl';
-  link.click();
+  const stl = exporter.parse(scene);
+  const blob = new Blob([stl],{type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'rosary_ridgebed.stl';
+  a.click();
 }
 
-function animate() {
+function toggleView(){
+  const l = document.getElementById('laien');
+  const f = document.getElementById('forscher');
+  l.style.display = l.style.display==='none' ? 'block' : 'none';
+  f.style.display = f.style.display==='none' ? 'block' : 'none';
+}
+
+function animate(){
   requestAnimationFrame(animate);
+  if(isRotating) spiral.rotation.y += 0.002;
   controls.update();
-  // Leichte Animation der Spitze
-  star.rotation.y += 0.01;
-  star.position.y = 7.5 + Math.sin(Date.now() * 0.002) * 0.2;
   renderer.render(scene, camera);
 }
 animate();
 
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+window.onresize = () => {
+  camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+  renderer.setSize(window.innerWidth,window.innerHeight);
+};
 </script>
 </body>
 </html>
