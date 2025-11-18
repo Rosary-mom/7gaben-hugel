@@ -115,8 +115,7 @@ for(let i=0;i<12;i++){
 }
 starShape.closePath();
 const starGeo = new THREE.ExtrudeGeometry(starShape,{depth:0.4,bevelEnabled:true});
-const starMat = new THREE.MeshPhongMaterial({color:0xffd700,emissive:0xaa8800});
-const star = new THREE.Mesh(starGeo, starMat);
+const starMat = new THREE.Mesh(starGeo, new THREE.MeshPhongMaterial({color:0xffd700,emissive:0xaa8800}));
 star.rotation.x = -Math.PI/2;
 star.position.set(0,10.6,0);
 scene.add(star);
@@ -125,7 +124,7 @@ const pyramid = new THREE.Mesh(new THREE.ConeGeometry(1.9,4.2,6), starMat);
 pyramid.position.y = 9.9;
 scene.add(pyramid);
 
-// LICHT – jetzt wirklich hell!
+// LICHT – hell und golden
 scene.add(new THREE.AmbientLight(0xffffff, 4));
 const sun = new THREE.DirectionalLight(0xfff8e1, 10);
 sun.position.set(15,35,15);
@@ -147,7 +146,7 @@ const data = [
 // Raycaster – jetzt mit korrektem '
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-window.addEventListener('click', e => {  // <-- das war der Fehler!
+window.addEventListener('click', e => {  // <-- das ' war der Fehler!
   mouse.x = (e.clientX/window.innerWidth)*2-1;
   mouse.y = -(e.clientY/window.innerHeight)*2+1;
   raycaster.setFromCamera(mouse,camera);
