@@ -221,3 +221,188 @@ window.onresize = ()=>{
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>ROSARY RIDGEBED • 3D Gamifiziertes Labyrinth der 7 Gaben</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/examples/js/controls/PointerLockControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.167.1/examples/js/exporters/STLExporter.js"></script>
+  <style>
+    body{margin:0;overflow:hidden;background:#000;color:#ffd700;font-family:Arial;}
+    #ui{position:absolute;top:10px;left:10px;z-index:10;background:rgba(0,0,0,0.7);padding:15px;border-radius:12px;border:1px solid gold;}
+    #instructions{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);padding:10px;border-radius:8px;}
+    button{background:linear-gradient(#d4af37,#ffd700);border:none;padding:10px 20px;margin:5px;border-radius:8px;cursor:pointer;font-weight:bold;}
+  </style>
+</head>
+<body>
+<div id="ui">Score: <span id="score">0</span> | Gaben: <span id="gaben">0</span>/7 | <button onclick="toggleLock()">WASD Navigation</button></div>
+<div id="instructions">WASD = bewegen | Space = Springen | Klicke zum Starten (Pointer Lock)</div>
+
+<script>
+// Scene
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x001122);
+scene.fog = new THREE.FogExp2(0x001122, 0.002);
+
+const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+
+// Lights
+scene.add(new THREE.AmbientLight(0x404060, 2));
+const sun = new THREE.DirectionalLight(0xffd700, 5);
+sun.position.set(10, 30, 10);
+sun.castShadow = true;
+scene.add(sun);
+
+// Ground + Terrassen (wie Hügel)
+const terraces = [];
+const colors = [0x5c4033,0x6b4630,0x5d4037,0x4a3728,0x3e2b1f,0x2b1e16,0x228b22];
+for(let i=0;i<7;i++){
+  const geo = new THREE.CylinderGeometry(50-i*6, 55-i*6, 8, 64, 1, true);
+  const mat = new THREE.MeshStandardMaterial({color:colors[i], side:THREE.DoubleSide, roughness:0.9});
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.y = i*8 - 20;
+  mesh.receiveShadow = true;
+  scene.add(mesh);
+  terraces.push(mesh);
+}
+
+// Goldene Spiral-Wände als Labyrinth
+const walls = [];
+const points = [];
+let r=2, a=0, y=-20;
+for(let i=0;i<2000;i++){
+  points.push(new THREE.Vector3(r*Math.cos(a), y+4, r*Math.sin(a)));
+  a += 0.1;
+  r += 0.015;
+  if(i%150===0) y += 8;
+}
+const curve = new THREE.CatmullRomCurve3(points);
+const tube = new THREE.TubeGeometry(curve, 2000, 4, 16, false);
+const wallMat = new THREE.MeshPhysicalMaterial({color:0xffd700, metalness:1, roughness:0.2, emissive:0xaa8800});
+const spiralWall = new THREE.Mesh(tube, wallMat);
+spiralWall.castShadow = spiralWall.receiveShadow = true;
+scene.add(spiralWall);
+walls.push(spiralWall);
+
+// Gaben-Orbs
+const gaben = ["Furcht des Herrn","Frömmigkeit","Erkenntnis","Stärke","Rat","Verstand","Weisheit"];
+const orbs = [];
+for(let i=0;i<7;i++){
+  const orb = new THREE.Mesh(
+    new THREE.SphereGeometry(2,32,32),
+    new THREE.MeshBasicMaterial({color:0xffff00})
+  );
+  orb.position.set(Math.sin(i)*30, i*8 - 16, Math.cos(i)*30);
+  const light = new THREE.PointLight(0xffff00, 10, 50);
+  light.position.copy(orb.position);
+  scene.add(orb, light);
+  orbs.push(orb);
+}
+
+// Player (First Person)
+const controls = new THREE.PointerLockControls(camera, document.body);
+scene.add(controls.getObject());
+camera.position.y = 5;
+
+let move = {forward:false,backward:false,left:false,right:false};
+let velocity = new THREE.Vector3();
+let direction = new THREE.Vector3();
+let canJump = false;
+const gravity = 30;
+const jumpPower = 15;
+
+document.addEventListener('click', () => controls.lock());
+controls.addEventListener('lock', () => document.getElementById('instructions').style.display='none');
+controls.addEventListener('unlock', () => document.getElementById('instructions').style.display='block');
+
+document.addEventListener('keydown', e => {
+  switch(e.code){
+    case 'KeyW': move.forward = true; break;
+    case 'KeyS': move.backward = true; break;
+    case 'KeyA': move.left = true; break;
+    case 'KeyD': move.right = true; break;
+    case 'Space': if(canJump) velocity.y += jumpPower; canJump=false; break;
+  }
+});
+document.addEventListener('keyup', e => {
+  switch(e.code){
+    case 'KeyW': move.forward = false; break;
+    case 'KeyS': move.backward = false; break;
+    case 'KeyA': move.left = false; break;
+    case 'KeyD': move.right = false; break;
+  }
+});
+
+function toggleLock(){ controls.isLocked ? controls.unlock() : controls.lock(); }
+
+// Collision simple sphere
+function checkCollision(pos){
+  const playerBox = new THREE.Box3().setFromCenterAndSize(pos, new THREE.Vector3(2,4,2));
+  for(let wall of walls){
+    const wallBox = new THREE.Box3().setFromObject(wall);
+    if(playerBox.intersectsBox(wallBox)) return true;
+  }
+  return false;
+}
+
+// Game state
+let score = 0, collected = 0;
+function collectOrb(orb){
+  if(orb.position.distanceTo(controls.getObject().position) < 5){
+    scene.remove(orb);
+    orbs.splice(orbs.indexOf(orb),1);
+    collected++;
+    score += 1000;
+    document.getElementById('score').textContent = score;
+    document.getElementById('gaben').textContent = collected;
+    if(collected===7) alert('🏆 Weisheit erreicht! Vollendung!');
+  }
+}
+
+// Animate
+function animate(){
+  requestAnimationFrame(animate);
+
+  if(controls.isLocked){
+    direction.z = Number(move.forward) - Number(move.backward);
+    direction.x = Number(move.right) - Number(move.left);
+    direction.normalize();
+
+    velocity.x -= velocity.x * 10.0 * 0.016;
+    velocity.z -= velocity.z * 10.0 * 0.016;
+    velocity.y -= gravity * 0.016;
+
+    if(move.forward || move.backward) velocity.z -= direction.z * 40.0 * 0.016;
+    if(move.left || move.right) velocity.x -= direction.x * 40.0 * 0.016;
+
+    const deltaPos = velocity.clone().multiplyScalar(0.016);
+    const newPos = controls.getObject().position.clone().add(deltaPos);
+
+    if(!checkCollision(newPos)){
+      controls.getObject().position.add(deltaPos);
+    }
+    if(controls.getObject().position.y < 5){ velocity.y = 0; controls.getObject().position.y = 5; canJump = true; }
+  }
+
+  orbs.forEach(orb => { orb.rotation.y += 0.01; collectOrb(orb); });
+
+  renderer.render(scene, camera);
+}
+animate();
+
+window.onresize = () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+};
+</script>
+</body>
+</html>
