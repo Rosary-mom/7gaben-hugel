@@ -70,7 +70,7 @@ loader.load('https://i.imgur.com/4tZEm8T.jpeg', texture => {
   renderer.render(scene, camera);
 });
 
-// 7 Schichten Hügelbeet
+// 7 Schichten
 const colors = [0x8b4513,0x8b5a2b,0x228b22,0x654321,0x4b3621,0x5d4037,0x228b22];
 const gaben = ["Furcht des Herrn","Frömmigkeit","Erkenntnis","Stärke","Rat","Verstand","Weisheit"];
 for(let i=0;i<7;i++){
@@ -97,7 +97,7 @@ for(let i=0;i<1400;i++){
   points.push(new THREE.Vector3(radius*Math.cos(angle), y, radius*Math.sin(angle)));
   angle += 0.13;
   radius += 0.009;
-  if(i%100===0) y += 0.9;
+  if(i%100===0) y +=  += 0.9;
 }
 const curve = new THREE.CatmullRomCurve3(points);
 const tubeGeo = new THREE.TubeGeometry(curve,1400,0.25,16,false);
@@ -144,10 +144,10 @@ const data = [
   {psalm:"Psalm 134", text:"Segnet den Herrn …", denk:"Heureka – Vollendung"}
 ];
 
-// Raycaster
+// Raycaster – jetzt mit korrektem '
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-window.addEventListener('click', e => {  // <-- hier war das ' fehlend!
+window.addEventListener('click', e => {
   mouse.x = (e.clientX/window.innerWidth)*2-1;
   mouse.y = -(e.clientY/window.innerHeight)*2+1;
   raycaster.setFromCamera(mouse,camera);
