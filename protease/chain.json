@@ -1,6 +1,6 @@
 {
   "id": "protease-cdh-2026",
-  "archive": "PDB 1SCJ Subtilisin Carlsberg",
+  "archive": "PDB 1SCJ Subtilisin E (P04189, B. subtilis); Vergleich: Subtilisin Carlsberg P00780",
   "keys": {
     "epistemological": "Getrennt: Annahme, Datenbank, Telemetrie, Messung. schutz_faktor 0.8 ist Annahme.",
     "ontological": "Die Struktur ist ein Archivobjekt. Die Kurve ist kein Enzym.",
